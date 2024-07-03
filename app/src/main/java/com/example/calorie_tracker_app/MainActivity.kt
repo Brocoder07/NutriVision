@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
         //Placeholder for retrieve from database button
         btnRetrieveFromDatabase.setOnClickListener {
-            //Yet to be implemented
+            //To be implemented soon
         }
         //Set up the listener for reset camera button
         btnResetCamera.setOnClickListener {
