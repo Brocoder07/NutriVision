@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/holo_purple">
+
+    <TextView
+        android:id="@+id/fruitName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nutritional Info for Apple"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingBottom="8dp" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1"
+        android:shrinkColumns="1">
+
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Calories"
+                android:textColor="@android:color/white"
+                android:gravity="start"
+                android:padding="8dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/caloriesValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="52"
+                android:textColor="@android:color/white"
+                android:gravity="end"
+                android:padding="8dp" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Fat"
+                android:textColor="@android:color/white"
+                android:gravity="start"
+                android:padding="8dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/fatValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="0.2g"
+                android:textColor="@android:color/white"
+                android:gravity="end"
+                android:padding="8dp" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Fiber"
+                android:textColor="@android:color/white"
+                android:gravity="start"
+                android:padding="8dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/fiberValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="2.4g"
+                android:textColor="@android:color/white"
+                android:gravity="end"
+                android:padding="8dp" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Protein"
+                android:textColor="@android:color/white"
+                android:gravity="start"
+                android:padding="8dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/proteinValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="0.3g"
+                android:textColor="@android:color/white"
+                android:gravity="end"
+                android:padding="8dp" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Carbs"
+                android:textColor="@android:color/white"
+                android:gravity="start"
+                android:padding="8dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/carbsValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="14g"
+                android:textColor="@android:color/white"
+                android:gravity="end"
+                android:padding="8dp" />
+        </TableRow>
+
+        <TableRow>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Cholesterol"
+                android:textColor="@android:color/white"
+                android:gravity="start"
+                android:padding="8dp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/cholesterolValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="0mg"
+                android:textColor="@android:color/white"
+                android:gravity="end"
+                android:padding="8dp" />
+        </TableRow>
+
+    </TableLayout>
+
+    <!-- Add more rows for other nutritional info if needed -->
+
+</LinearLayout>

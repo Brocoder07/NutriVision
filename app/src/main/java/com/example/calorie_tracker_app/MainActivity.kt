@@ -1,16 +1,20 @@
 package com.example.calorie_tracker_app
 
 import android.Manifest
-import android.app.Activity
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.widget.Button
+import android.view.LayoutInflater
 import android.widget.ImageButton
 import android.widget.ImageView
+import android.widget.TableLayout
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.*
@@ -29,15 +33,27 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewFinder: PreviewView
     private lateinit var imageView: ImageView
 
-    private val pickImageResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+    private val pickImageResultLauncher: ActivityResultLauncher<Intent> = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
             val intent: Intent? = result.data
             val uri: Uri? = intent?.data
             uri?.let {
                 imageView.setImageURI(it)
                 imageView.visibility = ImageView.VISIBLE
                 viewFinder.visibility = PreviewView.GONE
+                showNutritionalInfo()
             }
+        }
+    }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            startCamera()
+        } else {
+            Toast.makeText(this, "Camera permission is needed to take photos.", Toast.LENGTH_SHORT).show()
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,11 +67,17 @@ class MainActivity : AppCompatActivity() {
         val btnRetrieveFromDatabase: ImageButton = findViewById(R.id.btn_retrieve_from_database)
         val btnResetCamera: ImageButton = findViewById(R.id.btn_reset_camera)
 
-        //Request camera permissions
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 1)
-        } else {
-            startCamera()
+        // Request camera permissions
+        when {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
+                startCamera()
+            }
+            ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA) -> {
+                Toast.makeText(this, "Camera permission is needed to take photos.", Toast.LENGTH_SHORT).show()
+            }
+            else -> {
+                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
         }
         //Set up the listener for camera button
         btnCamera.setOnClickListener {
@@ -82,37 +104,30 @@ class MainActivity : AppCompatActivity() {
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
-            //Used to bind the lifecycle of cameras to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            //Preview
             val preview = Preview.Builder()
                 .build()
                 .also {
                     it.setSurfaceProvider(viewFinder.surfaceProvider)
                 }
             imageCapture = ImageCapture.Builder().build()
-            //Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
             try {
-                //Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-                //Bind use cases to camera
-                cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture)
+                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
             } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
-        }, ContextCompat.getMainExecutor(this))
+
+        },ContextCompat.getMainExecutor(this))
     }
     private fun takePhoto() {
-        //Create time-stamped output file to hold the image
         val photoFile = File(
             outputDirectory,
-            SimpleDateFormat(FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + ".jpg")
-        //Create output options object which contains file + metadata
+            SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+                .format(System.currentTimeMillis()) + ".jpg"
+        )
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-        //Set up image capture listener, which is triggered after photo has been taken
         imageCapture.takePicture(
             outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
@@ -123,10 +138,10 @@ class MainActivity : AppCompatActivity() {
                     val msg = "Photo capture succeeded: $savedUri"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
-                    //Display the captured image in the ImageView
                     imageView.setImageURI(savedUri)
                     imageView.visibility = ImageView.VISIBLE
                     viewFinder.visibility = PreviewView.GONE
+                    showNutritionalInfo()
                 }
             })
     }
@@ -140,6 +155,36 @@ class MainActivity : AppCompatActivity() {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
         }
         return if (mediaDir != null && mediaDir.exists()) mediaDir else filesDir
+    }
+    private fun showNutritionalInfo() {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        val dialogLayout = inflater.inflate(R.layout.popup_info, null)
+
+        builder.setView(dialogLayout)
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val fruitName: TextView = dialogLayout.findViewById(R.id.fruitName)
+        val caloriesValue: TextView = dialogLayout.findViewById(R.id.caloriesValue)
+        val fatValue: TextView = dialogLayout.findViewById(R.id.fatValue)
+        val fiberValue: TextView = dialogLayout.findViewById(R.id.fiberValue)
+        val proteinValue: TextView = dialogLayout.findViewById(R.id.proteinValue)
+        val carbsValue: TextView = dialogLayout.findViewById(R.id.carbsValue)
+        val cholesterolValue: TextView = dialogLayout.findViewById(R.id.cholesterolValue)
+
+        //Populate with hardcoded values
+        fruitName.text = "Nutritional Info for Apple"
+        caloriesValue.text = "52"
+        fatValue.text = "0.2g"
+        fiberValue.text = "2.4g"
+        proteinValue.text = "0.3g"
+        carbsValue.text = "14g"
+        cholesterolValue.text = "0mg"
+
+        val dialog = builder.create()
+        dialog.show()
     }
     companion object {
         private const val TAG = "CameraXBasic"
