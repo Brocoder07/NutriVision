@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         val btnRetrieveFromDatabase: ImageButton = findViewById(R.id.btn_retrieve_from_database)
         val btnResetCamera: ImageButton = findViewById(R.id.btn_reset_camera)
 
-        // Request camera permissions
+        //Request camera permissions
         when {
             ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED -> {
                 startCamera()
