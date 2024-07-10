@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="button_capture" type="id" />
+    <item name="button_gallery" type="id" />
+    <item name="button_database" type="id" />
+    <item name="image_view" type="id" />
+    <item name="text_view_info" type="id" />
+    <item name="camera_preview" type="id" />
+    <item name="button_layout" type="id" />
+    <item name="btn_camera" type="id" />
+    <item name="viewFinder" type="id" />
+    <item name="btn_access_pictures" type="id" />
+    <item name="btn_retrieve_from_database" type="id" />
+    <item name="btn_reset_camera" type="id" />
+</resources>
