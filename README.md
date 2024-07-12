@@ -13,5 +13,5 @@ App features implemented till now:
    
 Features to be implemented yet (Need help):
 
-Tensorflowlite model integration. ( "URGENT HELP NEEDED: PROBLEM WITH MODEL INTEGRATION AND CODE.")
-Recommendation system.
+1) Tensorflowlite model integration. ( "URGENT HELP NEEDED: PROBLEM WITH MODEL INTEGRATION AND CODE.")
+2) Recommendation system.
