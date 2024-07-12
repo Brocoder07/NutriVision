@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                 viewFinder.visibility = PreviewView.GONE
                 contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 saveImageToDatabase(it.toString())
-                predictAndShowResults(it)
+                predictAndShowResults(it)//For Model
             }
         }
     }
@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                 imageView.setImageURI(it)
                 imageView.visibility = ImageView.VISIBLE
                 viewFinder.visibility = PreviewView.GONE
-                predictAndShowResults(it)
+                predictAndShowResults(it)//For Model
             }
         }
     }
@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                     imageView.visibility = ImageView.VISIBLE
                     viewFinder.visibility = PreviewView.GONE
                     saveImageToDatabase(savedUri.toString())
-                    predictAndShowResults(savedUri)
+                    predictAndShowResults(savedUri)// For Model
                 }
             })
     }
@@ -186,6 +186,7 @@ class MainActivity : AppCompatActivity() {
             imageDao.insertImage(ImageEntity(imagePath = imagePath))
         }.start()
     }
+    //Methods for model to process images start from here
     private fun loadModelFile(): Interpreter {
         val fileDescriptor = assets.openFd("model.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
@@ -219,9 +220,11 @@ class MainActivity : AppCompatActivity() {
         for (i in 0 until inputSize) {
             for (j in 0 until inputSize) {
                 val value = intValues[pixel++]
-                byteBuffer.putFloat(((value shr 16 and 0xFF) - 127.5f) / 127.5f)
-                byteBuffer.putFloat(((value shr 8 and 0xFF) - 127.5f) / 127.5f)
-                byteBuffer.putFloat(((value and 0xFF) - 127.5f) / 127.5f)
+                /*The values in the normalization step ((value shr 16 and 0xFF) - 127.5f) / 127.5f are standard for converting RGB values to a range of -1 to 1 which is common for many machine learning models
+                The normalization process shifts the RGB values from their original range of [0, 255] to [-1, 1]*/
+                byteBuffer.putFloat(((value shr 16 and 0xFF) - 127.5f) / 127.5f)//value shr 16 and 0xFF extracts the red component of the pixel
+                byteBuffer.putFloat(((value shr 8 and 0xFF) - 127.5f) / 127.5f)//value shr 8 and 0xFF extracts the green component of the pixel
+                byteBuffer.putFloat(((value and 0xFF) - 127.5f) / 127.5f)//value and 0xFF extracts the blue component of the pixel
             }
         }
         return byteBuffer
