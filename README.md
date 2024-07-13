@@ -9,8 +9,8 @@ App features implemented till now:
 2) Database integration- if you click on the search button a new screen pops up where all the photos clicked in the app gets stored on the screen, Also stores photos
    uploaded from the gallery.
 3) The users have option to retrieve and delete images from the database.
-   
-Features to be implemented yet (Need help):
+4) Tensorflowlite model integration. (Sometimes accurate and sometimes inaccurate)
 
-1) Tensorflowlite model integration. ( "HELP NEEDED UNABLE TO FIGURE OUT WHAT EXACTLY IS AFFECTING THE POP-UP SCREEN TO NOT SHOW UP AFTER PROCESSING")
-2) Recommendation system.
+Features to be implemented yet:
+
+Recommendation system.
