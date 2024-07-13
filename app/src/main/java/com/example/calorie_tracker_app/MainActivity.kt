@@ -139,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                 //Bind use cases to camera
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
-            } catch (exc: Exception) {
+            } catch (exc: ImageCaptureException) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(this))
