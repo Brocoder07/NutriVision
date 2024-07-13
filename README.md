@@ -2,7 +2,6 @@ A calorie tracking app utilizing computer vision offers a cutting-edge solution 
 
 The app has a camera UI with a camera button to click pictures, a gallery button to retrieve images from gallery and a search button to retrieve images clicked inside the app from a database and a reset button to reset camera position after clicking the camera button. So what the app does is, when a user takes a photo or uploads images from either gallery or the app's database, the tensorflow lite model predicts the fruit/vegetable in the image along with its nutritional info stored in a json file and displays the results on a pop-up window along with a recommendation system which tells the user top 3 fruits/vegetables similar to the one predicted by the model in the pop-up window.
 
-Project work still in progress.... 
 
 App features implemented till now:
 
@@ -13,5 +12,5 @@ App features implemented till now:
    
 Features to be implemented yet (Need help):
 
-1) Tensorflowlite model integration. ( "URGENT HELP NEEDED: PROBLEM WITH MODEL INTEGRATION AND CODE.")
+1) Tensorflowlite model integration. ( "HELP NEEDED UNABLE TO FIGURE OUT WHAT EXACTLY IS AFFECTING THE POP-UP SCREEN TO NOT SHOW UP AFTER PROCESSING")
 2) Recommendation system.
