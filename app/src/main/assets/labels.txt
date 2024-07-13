@@ -13,7 +13,7 @@ eggplant
 garlic
 ginger
 grapes
-jalapeno
+jalepeno
 kiwi
 lemon
 lettuce
