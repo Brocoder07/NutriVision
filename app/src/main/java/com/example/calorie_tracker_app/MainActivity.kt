@@ -10,6 +10,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageButton
+import kotlinx.coroutines.*
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -51,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                 viewFinder.visibility = PreviewView.GONE
                 contentResolver.takePersistableUriPermission(it, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 saveImageToDatabase(it.toString())
-                predictAndShowResults(it)//For Model
+                scope.launch { predictAndShowResults(it) }
             }
         }
     }
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                 imageView.setImageURI(it)
                 imageView.visibility = ImageView.VISIBLE
                 viewFinder.visibility = PreviewView.GONE
-                predictAndShowResults(it)//For Model
+                scope.launch { predictAndShowResults(it) }
             }
         }
     }
@@ -82,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         viewFinder = findViewById(R.id.viewFinder)
         imageView = findViewById(R.id.image_view)
         val btnCamera: ImageButton = findViewById(R.id.btn_camera)
-        val btnAccessPictures: ImageButton = findViewById(R.id.btn_access_pictures)
+        val btnAccessPictures: ImageButton = findViewById(R.id. btn_access_pictures)
         val btnRetrieveFromDatabase: ImageButton = findViewById(R.id.btn_retrieve_from_database)
         val btnResetCamera: ImageButton = findViewById(R.id.btn_reset_camera)
 
@@ -164,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                     imageView.visibility = ImageView.VISIBLE
                     viewFinder.visibility = PreviewView.GONE
                     saveImageToDatabase(savedUri.toString())
-                    predictAndShowResults(savedUri)// For Model
+                    scope.launch { predictAndShowResults(savedUri) }
                 }
             })
     }
@@ -186,7 +187,7 @@ class MainActivity : AppCompatActivity() {
             imageDao.insertImage(ImageEntity(imagePath = imagePath))
         }.start()
     }
-    //Methods for model to process images start from here
+    //Methods for model start from here
     private fun loadModelFile(): Interpreter {
         val fileDescriptor = assets.openFd("model.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
@@ -196,18 +197,23 @@ class MainActivity : AppCompatActivity() {
         val buffer: ByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
         return Interpreter(buffer)
     }
+    private val scope = CoroutineScope(Dispatchers.Default)//Take off heavy load on Main thread to prevent frame drops
+
     @RequiresApi(Build.VERSION_CODES.P)//Api 28+
-    private fun predictAndShowResults(imageUri: Uri) {
+    private suspend fun predictAndShowResults(imageUri: Uri) {
         val source = ImageDecoder.createSource(this.contentResolver, imageUri)
         val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _ ->
             decoder.isMutableRequired = true
         }
         val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 299, 299, true)
         val byteBuffer = convertBitmapToByteBuffer(scaledBitmap)
-        val prediction = Array(1) { FloatArray(1) }
+        val prediction = Array(1) { FloatArray(36) }
         tflite.run(byteBuffer, prediction)
         val predictedLabel = getLabel(prediction[0][0])
-        showNutritionInfo(predictedLabel)
+        withContext(Dispatchers.Main) {
+            showNutritionInfo(predictedLabel)
+        }
+        Log.i(TAG, "Predicted label: ${predictedLabel}",null)
     }
     private fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
         val inputSize = 299
@@ -220,11 +226,9 @@ class MainActivity : AppCompatActivity() {
         for (i in 0 until inputSize) {
             for (j in 0 until inputSize) {
                 val value = intValues[pixel++]
-                /*The values in the normalization step ((value shr 16 and 0xFF) - 127.5f) / 127.5f are standard for converting RGB values to a range of -1 to 1 which is common for many machine learning models
-                The normalization process shifts the RGB values from their original range of [0, 255] to [-1, 1]*/
-                byteBuffer.putFloat(((value shr 16 and 0xFF) - 127.5f) / 127.5f)//value shr 16 and 0xFF extracts the red component of the pixel
-                byteBuffer.putFloat(((value shr 8 and 0xFF) - 127.5f) / 127.5f)//value shr 8 and 0xFF extracts the green component of the pixel
-                byteBuffer.putFloat(((value and 0xFF) - 127.5f) / 127.5f)//value and 0xFF extracts the blue component of the pixel
+                byteBuffer.putFloat(((value shr 16 and 0xFF) - 127.5f) / 127.5f)
+                byteBuffer.putFloat(((value shr 8 and 0xFF) - 127.5f) / 127.5f)
+                byteBuffer.putFloat(((value and 0xFF) - 127.5f) / 127.5f)
             }
         }
         return byteBuffer
@@ -260,5 +264,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
     }
 }
