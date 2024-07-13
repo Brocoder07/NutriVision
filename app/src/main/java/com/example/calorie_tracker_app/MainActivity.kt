@@ -31,6 +31,7 @@ import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {
 
@@ -139,7 +140,7 @@ class MainActivity : AppCompatActivity() {
                 //Bind use cases to camera
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
-            } catch (exc: ImageCaptureException) {
+            } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
         }, ContextCompat.getMainExecutor(this))
@@ -187,9 +188,8 @@ class MainActivity : AppCompatActivity() {
             imageDao.insertImage(ImageEntity(imagePath = imagePath))
         }.start()
     }
-    //Methods for model start from here
     private fun loadModelFile(): Interpreter {
-        val fileDescriptor = assets.openFd("model.tflite")
+        val fileDescriptor = assets.openFd("lite_model.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
         val startOffset = fileDescriptor.startOffset
@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity() {
         val buffer: ByteBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
         return Interpreter(buffer)
     }
-    private val scope = CoroutineScope(Dispatchers.Default)//Take off heavy load on Main thread to prevent frame drops
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     @RequiresApi(Build.VERSION_CODES.P)//Api 28+
     private suspend fun predictAndShowResults(imageUri: Uri) {
@@ -209,11 +209,17 @@ class MainActivity : AppCompatActivity() {
         val byteBuffer = convertBitmapToByteBuffer(scaledBitmap)
         val prediction = Array(1) { FloatArray(36) }
         tflite.run(byteBuffer, prediction)
-        val predictedLabel = getLabel(prediction[0][0])
+        var predictedFruit = " "
+        for(i in 0 until prediction[0].size)
+        {
+            if(prediction[0][i]>=0.9){
+                predictedFruit = getLabel(i)//If Accuracy is >=0.9, display the matching fruit/vegetable
+            }
+        Log.v(TAG,"Predicted: $i",null)}
         withContext(Dispatchers.Main) {
-            showNutritionInfo(predictedLabel)
+            showNutritionInfo(predictedFruit)
         }
-        Log.i(TAG, "Predicted label: ${predictedLabel}",null)
+        Log.i(TAG, "Predicted label: ${predictedFruit}",null)
     }
     private fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
         val inputSize = 299
@@ -233,14 +239,14 @@ class MainActivity : AppCompatActivity() {
         }
         return byteBuffer
     }
-    private fun getLabel(predictedValue: Float): String {
-        return when (predictedValue.toInt()) {
-            1 -> "apple" 2 -> "banana" 3 -> "beetroot" 4 -> "bell pepper" 5 -> "cabbage" 6 ->"capsicum"
-            7 ->"carrot" 8 ->"cauliflower" 9 ->"chilli pepper" 10->"corn" 11->"cucumber" 12->"eggplant"
-            13->"garlic" 14->"ginger" 15->"grapes" 16->"jalapeno" 17->"kiwi" 18->"lemon" 19->"lettuce"
-            20->"mango" 21->"onion" 22->"orange" 23->"paprika" 24->"pear" 25->"peas" 26->"pineapple"
-            27->"pomegranate" 28->"potato" 29->"radish" 30->"soy beans" 31->"spinach" 32->"sweetcorn"
-            33->"sweetpotato" 34->"tomato" 35->"turnip" 36->"watermelon" else -> "Unknown"
+    private fun getLabel(predictedValue: Int): String {
+        return when (predictedValue) {
+            0 -> "apple" 1 -> "banana" 2 -> "beetroot" 3 -> "bell pepper" 4 -> "cabbage" 5 ->"capsicum"
+            6 ->"carrot" 7 ->"cauliflower" 8 ->"chilli pepper" 9->"corn" 10->"cucumber" 11->"eggplant"
+            12->"garlic" 13->"ginger" 14->"grapes" 15->"jalepeno" 16->"kiwi" 17->"lemon" 18->"lettuce"
+            19->"mango" 20->"onion" 21->"orange" 22->"paprika" 23->"pear" 24->"peas" 25->"pineapple"
+            26->"pomegranate" 27->"potato" 28->"radish" 29->"soy beans" 30->"spinach" 31->"sweetcorn"
+            32->"sweetpotato" 33->"tomato" 34->"turnip" 35->"watermelon" else -> "Unknown"
         }
     }
     private fun showNutritionInfo(predictedLabel: String) {
@@ -248,17 +254,17 @@ class MainActivity : AppCompatActivity() {
         if (nutritionInfo != null) {
             val dialogView = layoutInflater.inflate(R.layout.nutrition_popup, null)
             dialogView.findViewById<TextView>(R.id.foodName).text = nutritionInfo.name
-            dialogView.findViewById<TextView>(R.id.calories).text = "Calories: ${nutritionInfo.calories}"
-            dialogView.findViewById<TextView>(R.id.sodium).text = "Sodium: ${nutritionInfo.sodium}"
-            dialogView.findViewById<TextView>(R.id.potassium).text = "Potassium: ${nutritionInfo.potassium}"
-            dialogView.findViewById<TextView>(R.id.carbohydrates).text = "Carbohydrates: ${nutritionInfo.carbohydrates}"
-            dialogView.findViewById<TextView>(R.id.protein).text = "Protein: ${nutritionInfo.protein}"
+            dialogView.findViewById<TextView>(R.id.calories).text = "${nutritionInfo.calories}"
+            dialogView.findViewById<TextView>(R.id.sodium).text = "${nutritionInfo.sodium}"
+            dialogView.findViewById<TextView>(R.id.potassium).text = "${nutritionInfo.potassium}"
+            dialogView.findViewById<TextView>(R.id.carbohydrates).text = "${nutritionInfo.carbohydrates}"
+            dialogView.findViewById<TextView>(R.id.protein).text = "${nutritionInfo.protein}"
             AlertDialog.Builder(this)
                 .setView(dialogView)
                 .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
                 .show()
         } else {
-            Toast.makeText(this, "Nutrition information not found for $predictedLabel", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Nutrition information not found $predictedLabel", Toast.LENGTH_SHORT).show()
         }
     }
     companion object {
