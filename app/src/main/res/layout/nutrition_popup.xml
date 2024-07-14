@@ -3,19 +3,30 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="16dp"
-    android:background="#79305a"
+    android:background="#E0218A"
     android:stretchColumns="1">
+
+   <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Nutritional Information"
+    android:textAlignment="center"
+    android:textColor="@color/white"
+    android:textSize="20dp"/>
+
 
     <TableRow>
         <TextView
             android:text="Nutrient"
             android:textStyle="bold"
+            android:padding="5sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"/>
         <TextView
             android:text="Value"
             android:textStyle="bold"
+            android:padding="5sp"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:layout_width="wrap_content"
@@ -25,12 +36,14 @@
     <TableRow>
         <TextView
             android:text="Name"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/foodName"
             android:textColor="@color/white"
+            android:padding="5sp"
             android:textAlignment="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
@@ -40,10 +53,12 @@
         <TextView
             android:text="Calories"
             android:textColor="@color/white"
+            android:padding="5sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/calories"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:textAlignment="center"
             android:layout_width="wrap_content"
@@ -54,10 +69,12 @@
         <TextView
             android:text="Sodium"
             android:textColor="@color/white"
+            android:padding="5sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/sodium"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:textAlignment="center"
             android:layout_width="wrap_content"
@@ -67,11 +84,13 @@
     <TableRow>
         <TextView
             android:text="Potassium"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/potassium"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:textAlignment="center"
             android:layout_width="wrap_content"
@@ -81,11 +100,13 @@
     <TableRow>
         <TextView
             android:text="Carbs"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/carbohydrates"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:textAlignment="center"
             android:layout_width="wrap_content"
@@ -95,11 +116,13 @@
     <TableRow>
         <TextView
             android:text="Protein"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@+id/protein"
+            android:padding="5sp"
             android:textColor="@color/white"
             android:textAlignment="center"
             android:layout_width="wrap_content"
