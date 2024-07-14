@@ -212,8 +212,8 @@ class MainActivity : AppCompatActivity() {
         var predictedFruit = " "
         for(i in 0 until prediction[0].size)
         {
-            if(prediction[0][i]>=0.9){
-                predictedFruit = getLabel(i)//If Accuracy is >=0.9, display the matching fruit/vegetable
+            if(prediction[0][i]>=0.7){
+                predictedFruit = getLabel(i)//If Accuracy is >=0.7, display the matching fruit/vegetable
             }
         Log.v(TAG,"Predicted: $i",null)}
         withContext(Dispatchers.Main) {
